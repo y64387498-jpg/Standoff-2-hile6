@@ -1,4 +1,4 @@
-name: Android APK Builder
+name: Build Standoff 2 ESP Demo
 
 on:
   workflow_dispatch:
@@ -8,11 +8,10 @@ on:
 
 jobs:
   build:
-    name: Build Android APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download Source
+      - name: Download Repository
         uses: actions/checkout@v4
 
       - name: Install Java
@@ -21,14 +20,19 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - name: Extract Android Project
+        run: |
+          unzip -o Standoff2_ESP_Demo.zip -d source
 
-      - name: Build Debug APK
-        run: gradle assembleDebug
+      - name: Build APK
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: '8.9'
+          build-root-directory: source/Standoff2_ESP_Demo
+          arguments: assembleDebug
 
-      - name: Save APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ESP-Demo
-          path: app/build/outputs/apk/debug/*.apk
+          name: Standoff2-ESP-Demo-APK
+          path: source/Standoff2_ESP_Demo/app/build/outputs/apk/debug/*.apk
